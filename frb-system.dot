@@ -1,0 +1,88 @@
+digraph {
+
+node [ shape="rectangle" ];
+
+frbtsar [label="FRB Tsars"];
+
+subgraph cluster_1 {
+rankdir="LR"
+ordering="in"
+#rank="same"
+edge [color="blue", constraint=false];
+
+L1 [label="L1"];
+L23 [label="L2/L3"];
+L4 [label="L4 pipeline"];
+
+L1 -> L23
+L23 -> L4
+}
+subgraph cluster_2 {
+rankdir="TB";
+InfluxDB
+VOEvent
+TriggerOutriggers
+}
+
+
+L4 -> InfluxDB
+L4 -> VOEvent
+L4 -> TriggerOutriggers
+
+
+
+L4db [label="L4 database (mariadb)"];
+
+L4 -> L4db;
+
+L4backup [label="L4 DB backup"];
+
+L4backup -> L4db;
+
+Netboot [label="Net boot"];
+L1ops [label="L1 Operations page"];
+
+slackalerts [label="Slack alerts"];
+
+candidates [label="Candidate vetting"];
+
+frbweb [label="frb-web"];
+
+
+L1 -> Netboot [style=dashed];
+
+frbtsar -> Grafana;
+Grafana -> Prometheus;
+
+frbansible [label="FRB-ansible"];
+
+Prometheus -> frbansible [style=dashed];
+
+frbtsar -> slackalerts;
+
+onlinewaterfaller [label="Online Waterfaller"];
+dailymonitor [label="Daily Monitoring"];
+
+frbtsar -> candidates;
+frbtsar -> Bokeh;
+frbtsar -> IBV;
+frbtsar -> UCG;
+frbtsar -> IntensityML;
+frbtsar -> onlinewaterfaller;
+frbtsar -> dailymonitor;
+
+candidates -> frbweb;
+
+frbweb -> mongodb [label="???"];
+
+L4 -> buckets [ label="???" ];
+buckets -> frbmaster [label="???"];
+
+frbmaster [label="frb-master"];
+
+frbmaster -> mongodb [label="???"];
+
+frbtsar -> L1ops;
+L1ops -> L1;
+
+}
